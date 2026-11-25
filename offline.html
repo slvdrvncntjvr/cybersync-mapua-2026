@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review four fictional AI security cases and write an evidence-backed finding at CyberSync.">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rkJx45+QKlkCcBIytgtLzvw/pl7YvWPdXc1Z/pXIqtQ='; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <title>MapúaDesk AI | CyberSync Triage Workbench</title>
+  <link rel="icon" href="data:,">
+  <style>:root {
+  font: 100%/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #17253a;
+  background: #f2f5fa;
+  --muted: #4d5d74;
+  --border: #d8e0eb;
+  --paper: #fff;
+  --blue: #164ca7;
+  --blue-light: #edf4ff;
+  --navy: #101e37;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html.projector { font-size: 131.25%; }
+body, p, ul, ol, h1, h2, h3, h4 { margin: 0; }
+button, input, textarea, select { font: inherit; }
+button, select { cursor: pointer; }
+button:disabled { cursor: default; opacity: .55; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid #2e6ee0;
+  outline-offset: 3px;
+}
+a { color: var(--blue); }
+.skip-link { position: fixed; top: .75rem; left: 1rem; z-index: 10; transform: translateY(-150%); padding: .5rem .75rem; background: var(--paper); }
+.skip-link:focus { transform: translateY(0); }
+.shell { width: min(100% - 3rem, 78rem); margin-inline: auto; }
+.topbar { background: var(--paper); border-bottom: 1px solid var(--border); }
+.topbar-inner, .brand, .section-heading, .next-card, .evidence-heading, .case-footer, .presenter-bar, .presenter-label, .controls, .footer {
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+}
+.topbar-inner, .section-heading, .next-card, .evidence-heading, .case-footer, .presenter-bar, .footer { justify-content: space-between; }
+.topbar-inner { min-height: 4.75rem; padding-block: .65rem; }
+.brand { flex-wrap: nowrap; }
+.brand strong, .brand small { display: block; }
+.brand strong { font-size: 1.05rem; letter-spacing: -.025em; }
+.brand small { color: var(--muted); font-size: .875rem; }
+.brand-mark { display: grid; gap: 4px; place-content: center; width: 2.45rem; aspect-ratio: 1; border-radius: .7rem; background: var(--navy); flex: none; }
+.brand-mark i { display: block; height: 2px; width: .96rem; background: #b4d2ff; border-radius: 2px; }
+.brand-mark i:nth-child(2) { width: .69rem; }
+.brand-mark i:nth-child(3) { width: .45rem; background: #f7ca76; }
+.synthetic, .asset, .capabilities li { border-radius: 1rem; padding: .28rem .65rem; font-weight: 650; font-size: .875rem; }
+.synthetic { color: #613c00; background: #fff0ce; }
+.hero {
+  margin-top: 1.6rem; border-radius: 1.2rem; padding: clamp(1.25rem, 4.5vw, 3.1rem);
+  background: radial-gradient(ellipse at 95% 5%, #214680, transparent 70%), var(--navy);
+  color: #fff; display: grid; grid-template-columns: 1.55fr 1fr; align-items: center; gap: 2rem;
+}
+.eyebrow { color: #315c99; font-size: .875rem; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; }
+.hero .eyebrow { color: #f7ca76; }
+.hero h1 { margin: .4rem 0 .55rem; font-size: clamp(2.15rem, 4.6vw, 4rem); line-height: 1.03; letter-spacing: -.062em; max-width: 15ch; }
+.hero-copy > p:last-child { max-width: 42ch; color: #e0eaff; font-size: 1.05rem; }
+.hero-gates { border: 1px solid #5476ab; border-radius: .85rem; background: #142a4bc9; overflow: hidden; }
+.hero-gates div { display: grid; grid-template-columns: auto 1fr; gap: 0 .8rem; align-items: center; padding: .6rem .95rem; }
+.hero-gates div + div { border-top: 1px solid #5476ab; }
+.hero-gates span { grid-row: span 2; color: #f7ca76; font: 750 .875rem/1.3 ui-monospace, monospace; }
+.hero-gates strong { font-size: 1rem; }
+.hero-gates small { color: #e0eaff; font-size: .875rem; }
+.primary-nav { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1.25rem 0; padding: .35rem; border: 1px solid var(--border); border-radius: .85rem; background: var(--paper); width: fit-content; max-width: 100%; }
+.primary-nav button, .case-nav button { border: 1px solid transparent; border-radius: .6rem; color: var(--muted); background: transparent; text-align: left; font-weight: 700; padding: .55rem .8rem; min-height: 2.75rem; }
+.primary-nav button[aria-current], .case-nav button[aria-current] { background: var(--blue-light); border-color: #c1d6fa; color: #103e88; }
+.primary-nav button:hover, .case-nav button:hover { background: var(--blue-light); }
+.section-heading { align-items: flex-end; margin-bottom: 1rem; }
+.section-heading h2 { font-size: clamp(1.75rem, 3vw, 2.6rem); line-height: 1.12; letter-spacing: -.045em; }
+.asset { background: #e5ebf4; color: #304a6f; overflow-wrap: anywhere; }
+.muted { color: var(--muted); }
+.scope-grid, .report-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+.card { min-width: 0; background: var(--paper); border: 1px solid var(--border); border-radius: .92rem; padding: clamp(1rem, 2.5vw, 1.55rem); }
+.card h3 { font-size: 1.28rem; line-height: 1.25; letter-spacing: -.025em; }
+.policy ul { padding-left: 1.25rem; margin-top: .55rem; }
+.policy li { padding-block: .2rem; }
+.covered { border-top: 4px solid #307761; }
+.excluded { border-top: 4px solid #a06b25; }
+.next-card { margin-top: .9rem; }
+.next-card p { color: var(--muted); margin-top: .25rem; }
+.button { min-height: 2.75rem; padding: .55rem .85rem; border-radius: .6rem; border: 1px solid transparent; font-weight: 720; }
+.primary { color: white; background: var(--blue); }
+.primary:hover { background: #123e86; }
+.secondary { color: #183b71; background: white; border-color: #b9c9e1; }
+.secondary:hover, .secondary[aria-pressed="true"] { background: var(--blue-light); }
+.text-button { color: var(--blue); border: 0; background: transparent; padding: .5rem .25rem; min-height: 2.75rem; font-weight: 700; text-decoration: underline; text-underline-offset: .19em; }
+.case-layout { display: grid; grid-template-columns: 11.5rem minmax(0, 1fr); gap: 1rem; align-items: start; }
+.case-nav { display: grid; gap: .32rem; padding: .35rem; background: white; border: 1px solid var(--border); border-radius: .8rem; }
+.case-nav small { display: block; font-size: .875rem; font-weight: 650; }
+.case-workspace { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: .9rem; align-items: start; }
+.case-file h3 { font-size: clamp(1.45rem, 2.4vw, 2.2rem); margin: .2rem 0 .48rem; }
+.case-summary { color: var(--muted); }
+.capabilities { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .42rem; margin: .9rem 0 1.1rem; }
+.capabilities li { background: var(--blue-light); color: #17427e; }
+.evidence-heading { padding-top: .8rem; border-top: 1px solid var(--border); }
+.trace { list-style: none; padding: 0; display: grid; gap: .5rem; margin: .55rem 0; }
+.trace li { background: #f4f7fb; border-left: 3px solid #8badde; padding: .65rem .7rem; border-radius: .35rem; overflow-wrap: anywhere; }
+.trace li p { margin-top: .2rem; }
+.record-id { margin-right: .45rem; color: #1a4d9d; font: 750 .875rem/1.2 ui-monospace, monospace; }
+.case-choices { display: grid; gap: .55rem; }
+.case-choices label[for], legend, .report-fields label { font-weight: 700; }
+.case-choices select, textarea { border: 1px solid #aab9cf; border-radius: .48rem; background: white; color: #17253a; width: 100%; padding: .55rem .65rem; }
+.case-choices select { min-height: 2.75rem; overflow: hidden; }
+fieldset { border: 0; border-top: 1px solid var(--border); padding: .36rem 0 0; margin: .4rem 0; min-width: 0; }
+legend { padding: 0 .4rem 0 0; }
+.option { display: flex; align-items: baseline; gap: .56rem; padding: .22rem 0; }
+.option input { width: 1rem; height: 1rem; accent-color: var(--blue); flex: 0 0 1rem; margin: .25rem 0 0; }
+.reasoning, .cue { background: var(--blue-light); border: 1px solid #c6d9f9; border-radius: .65rem; padding: .75rem; margin-top: .4rem; }
+.cue { background: #fff5df; border-color: #e9cc92; }
+.reasoning p, .cue p { margin-top: .35rem; }
+.case-footer { margin-top: .9rem; }
+.report-intro { color: var(--muted); margin: -.35rem 0 .9rem; }
+.report-fields textarea { display: block; min-height: 6.7rem; resize: vertical; }
+.report-fields label, .report-fields .field-prompt { display: block; }
+.field-prompt { color: var(--muted); min-height: 2.8em; font-size: .92rem; }
+.worksheet .controls { margin-top: 1rem; }
+.storage-note, .status { margin-top: .35rem; color: var(--muted); font-size: .9rem; }
+.status:empty { display: none; }
+.example { margin-top: .9rem; }
+.example h4 { margin: .85rem 0 .24rem; }
+.presenter-bar { border: 1px solid #c9ad6f; border-radius: .7rem; background: #fff5df; padding: .65rem .8rem; margin-bottom: 1rem; }
+#clock { font: 750 1.2rem/1.3 ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.footer { padding: 1.4rem 0; color: var(--muted); font-size: .875rem; }
+dialog { width: min(100% - 2rem, 32rem); border: 1px solid var(--border); border-radius: .85rem; padding: 1rem; color: inherit; }
+dialog::backdrop { background: #10213780; }
+dialog h2 { font-size: 1.3rem; }
+dialog p { margin: .3rem 0 .75rem; }
+dialog textarea { min-height: 11rem; margin-bottom: .5rem; }
+.projector .hero { padding-block: 1rem; }
+.projector .hero-gates { display: none; }
+.projector .hero { grid-template-columns: 1fr; }
+.projector .hero h1 { font-size: 2.25rem; max-width: none; }
+@media (max-width: 67rem) {
+  .case-workspace { grid-template-columns: 1fr; }
+  .projector .case-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 50rem) {
+  .hero { grid-template-columns: 1fr; gap: 1rem; }
+  .case-layout { grid-template-columns: 1fr; }
+  .case-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 37rem) {
+  .shell { width: calc(100% - 1.5rem); }
+  .hero { margin-top: .8rem; }
+  .scope-grid, .report-fields { grid-template-columns: 1fr; }
+  .case-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .primary-nav { width: 100%; gap: .16rem; }
+  .primary-nav button { padding-inline: .5rem; font-size: .9rem; }
+  .field-prompt { min-height: 0; }
+}
+</style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>MapúaDesk AI</strong><small>CyberSync triage workbench</small></span></div>
+      <span class="synthetic">Fictional training lab</span>
+    </div>
+  </header>
+  <main class="shell" id="main">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Think Like an AI Agent</p>
+        <h1 id="page-title">Where did the boundary break?</h1>
+        <p>Review four incident files. Decide what the evidence supports and turn one finding into a report.</p>
+      </div>
+      <div class="hero-gates" aria-label="Three triage questions">
+        <div><span>01</span><strong>Scope</strong><small>Does the policy cover it?</small></div>
+        <div><span>02</span><strong>Evidence</strong><small>What actually happened?</small></div>
+        <div><span>03</span><strong>Severity</strong><small>How serious is the impact?</small></div>
+      </div>
+    </section>
+    <nav class="primary-nav" aria-label="Workbench">
+      <button type="button" data-view="scope" aria-controls="scope">Scope policy</button>
+      <button type="button" data-view="cases" aria-controls="cases">Case files</button>
+      <button type="button" data-view="report" aria-controls="report">Report worksheet</button>
+    </nav>
+    <noscript><p class="card">Enable JavaScript to use the workbench, or use the printed case packet with your facilitator.</p></noscript>
+    <section id="presenter" class="presenter-bar" aria-label="Presenter controls" hidden>
+      <div class="presenter-label"><strong>Presenter mode</strong><span id="clock" role="timer" aria-label="Time remaining">25:00</span></div>
+      <div class="controls">
+        <button type="button" id="timer-control" class="button secondary">Start timer</button>
+        <button type="button" id="timer-reset" class="button secondary">Reset timer</button>
+        <button type="button" id="projector" class="button secondary" aria-pressed="false">Projector text</button>
+        <button type="button" id="exit-presenter" class="text-button">Exit presenter mode</button>
+      </div>
+    </section>
+    <section class="view" id="scope" aria-labelledby="scope-title">
+      <div class="section-heading"><div><p class="eyebrow">Triage desk</p><h2 id="scope-title" tabindex="-1">Read the scope policy</h2></div><span class="asset" id="asset"></span></div>
+      <div class="scope-grid">
+        <article class="card policy covered"><h3>Covered by this exercise</h3><ul id="scope-in"></ul></article>
+        <article class="card policy excluded"><h3>Outside this exercise</h3><ul id="scope-out"></ul></article>
+      </div>
+      <div class="card next-card"><div><h3>With your partner</h3><p>Open a case, cite a record, and agree on a verdict and a fix. Take a first pass before opening the comparison.</p></div><button type="button" class="button primary" id="start-cases">Open the case files</button></div>
+    </section>
+    <section class="view" id="cases" aria-labelledby="cases-title" hidden>
+      <div class="section-heading"><div><p class="eyebrow">Triage desk</p><h2 id="cases-title" tabindex="-1">Case files</h2></div><p id="case-progress" class="muted"></p></div>
+      <div class="case-layout">
+        <nav id="case-nav" class="case-nav" aria-label="Select a case"></nav>
+        <div class="case-workspace">
+          <article class="card case-file" aria-labelledby="case-title">
+            <p class="eyebrow" id="case-label"></p>
+            <h3 id="case-title" tabindex="-1"></h3>
+            <p id="case-summary" class="case-summary"></p>
+            <ul id="capabilities" class="capabilities" aria-label="Architecture"></ul>
+            <div class="evidence-heading"><h4>Evidence record</h4><span class="muted">Simulated</span></div>
+            <ol id="trace" class="trace"></ol>
+            <button type="button" id="reveal-evidence" class="button secondary" hidden>Show remaining evidence</button>
+            <aside class="cue" id="facilitator-cue" hidden><strong>Facilitator cue</strong><p id="cue-text"></p></aside>
+          </article>
+          <form class="card case-choices" id="case-form">
+            <h3>Your triage</h3>
+            <label for="verdict">Policy verdict</label><select id="verdict"></select>
+            <fieldset id="risk-choices"><legend>Relevant mechanisms</legend></fieldset>
+            <fieldset id="defense-choices"><legend>Most useful first response</legend></fieldset>
+            <button type="button" id="compare" class="button primary" aria-expanded="false" aria-controls="reasoning">Compare reasoning</button>
+            <div id="reasoning" class="reasoning" hidden><strong id="reasoning-verdict"></strong><p id="reasoning-mechanism"></p><p id="reasoning-fix"></p></div>
+          </form>
+        </div>
+      </div>
+      <div class="case-footer"><button id="previous-case" class="button secondary" type="button">Previous case</button><button id="next-case" class="button primary" type="button">Next case</button></div>
+    </section>
+    <section class="view" id="report" aria-labelledby="report-title" hidden>
+      <div class="section-heading"><div><p class="eyebrow">Case 02 · Ticket assistant</p><h2 id="report-title" tabindex="-1">Write the report</h2></div><button class="button secondary" id="review-case-two" type="button">Review case 2</button></div>
+      <p class="report-intro">Write for an engineer who needs to verify the finding. Cite the evidence IDs and state what the records establish.</p>
+      <form id="worksheet" class="card worksheet" aria-label="Bug report worksheet">
+        <div id="report-fields" class="report-fields"></div>
+        <div class="controls">
+          <button type="button" id="copy-report" class="button primary">Copy Markdown</button>
+          <button type="button" id="download-report" class="button secondary">Download .md</button>
+          <button type="button" id="example-toggle" class="text-button" aria-expanded="false" aria-controls="report-example">Show example</button>
+        </div>
+        <p id="save-note" class="storage-note"></p>
+        <p id="report-status" class="status" role="status"></p>
+      </form>
+      <section id="report-example" class="card example" aria-labelledby="example-title" hidden><h3 id="example-title" tabindex="-1">Worked example</h3><div id="example-fields"></div></section>
+    </section>
+    <footer class="footer"><p>CyberSync · GDG on Campus Mapúa University</p><a id="presenter-link" href="#presenter">Presenter mode</a></footer>
+  </main>
+  <dialog id="copy-dialog" aria-labelledby="copy-title">
+    <form method="dialog"><h2 id="copy-title">Copy your report</h2><p>Select the draft and copy it with your device’s controls.</p><textarea id="manual-copy" readonly aria-label="Markdown draft"></textarea><button class="button secondary">Close</button></form>
+  </dialog>
+  <dialog id="example-dialog" aria-labelledby="example-prompt-title">
+    <form method="dialog"><h2 id="example-prompt-title">Open the worked example?</h2><p>Take a first pass at your own report, then compare what each version claims.</p><div class="controls"><button class="button secondary" value="cancel">Keep drafting</button><button class="button primary" value="show">Show example</button></div></form>
+  </dialog>
+  <script id="workshop-data" type="application/json">{"asset": "desk.mapua-demo.invalid", "scope": {"included": ["Disclosure of another person’s restricted information", "Unauthorized changes to someone else’s records", "Demonstrated security impact from unsafe browser or server interpretation"], "excluded": ["Changes to tone or behavior confined to your own chat", "Disclosure of harmless assistant instructions", "Speculation without evidence of a boundary crossing"]}, "verdicts": ["In scope, evidence supports a finding", "Out of scope under the workshop policy", "Potentially in scope, more evidence needed"], "risks": ["Prompt Injection", "Excessive Agency", "Improper Output Handling", "Classic server-side injection"], "cases": [{"id": "1", "title": "The Sarcastic Registrar Bot", "short": "Registrar bot", "summary": "The public FAQ answers from a static handbook. It uses no accounts or tools and displays answers as plain text.", "capabilities": ["Public chat", "Public handbook only", "Plain-text reply"], "trace": [["1A", "Chat record", "A visitor asks the FAQ to change its tone. The record omits the input wording."], ["1B", "Assistant reply", "The bot adopts a sarcastic tone and repeats its greeting rule: ‘Answer campus questions politely.’"], ["1C", "Application audit", "The reply was displayed only in the visitor’s chat. No restricted sources were read and no action was sent."]], "defenses": ["Add a stricter instruction about tone.", "Record it as self-only behavior under this policy.", "Give the bot access to student accounts to improve its answers."], "decision": "Out of scope under the workshop policy.", "mechanism": "The visitor influenced the model’s behavior. Records 1B and 1C show a self-only reply and a harmless instruction. The fixture establishes no security impact beyond that chat.", "fix": "Keep the FAQ limited to public data and plain-text output. Handle tone as a product-quality issue.", "cue": "If someone says ‘the bot failed,’ agree about behavior. Ask whose data, permissions, or records changed, and which record supports the answer."}, {"id": "2", "title": "The Auto-Previewing Ticket Assistant", "short": "Ticket assistant", "summary": "A staff-only ticket view summarizes public submissions. The summarizer can also see restricted scholarship data. The preview can load external images in the output.", "capabilities": ["Public ticket", "Restricted scholarship data", "External image preview"], "trace": [["2A", "Ticket and staff event", "A public ticket included a recorded untrusted directive. A staff reviewer selected the ordinary Summarize action. The fixture omits the directive."], ["2B", "Context audit", "The assistant context included a restricted scholarship-status field for one fictional student. This field was unnecessary for the summary."], ["2C", "Boundary capture", "The staff preview made an automatic external request. The mock recipient recorded the same restricted status field. The staff member never clicked or approved the external preview."], ["2D", "Patched comparison", "With automatic external images disabled, the paired fixture shows the summary still displayed. The mock recipient recorded no request from this preview."]], "defenses": ["Require staff to look carefully at every summary.", "Add a stronger instruction to ignore the ticket.", "Disable automatic external previews and keep unrelated restricted data out of summaries."], "decision": "In scope, evidence supports a finding.", "mechanism": "The untrusted ticket is the input. The preview is the outbound channel. Record 2C proves disclosure to the mock recipient. The ordinary staff Summarize action is a precondition, even though the external request needed no separate click.", "fix": "Disable automatic external image loading as the immediate control. Limit the summary’s data access independently. Verify with an approved synthetic regression fixture that the summary still works and the external preview stays blocked.", "cue": "Project 2A and 2B first. Ask ‘What would prove the data left?’ Then reveal 2C. Use 2D to show a control can block this channel while preserving the feature."}, {"id": "3", "title": "The Two Preview Engines", "short": "Two preview engines", "summary": "The moderation panel sends model output to a browser renderer. A separate prompt preview sends a user-editable field to a server template engine. Each handles text in a different place.", "capabilities": ["Model and user text", "Browser renderer", "Server template engine"], "trace": [["3A", "Browser inspection", "The moderation panel marked raw model output as trusted markup. A harmless classroom marker was displayed as formatting. The record establishes no script execution."], ["3B", "Server inspection", "The prompt preview evaluated a harmless fixture marker as template syntax on the server. The record contains no private data access or host-command evidence."]], "defenses": ["Display model text through a safe browser renderer and pass user fields as data into a fixed server template.", "Have the model promise to return only plain text.", "Apply browser output encoding to both the browser and template engine."], "decision": "Potentially in scope, more evidence needed for the security-impact claims.", "mechanism": "3A demonstrates unsafe browser handling, with XSS as a risk. 3B demonstrates server-side template evaluation of an untrusted marker. It involves direct user input, so it is classic SSTI. The captured effects do not establish browser-script or host-command execution.", "fix": "Render plain text as text, or use a constrained sanitizer if rich content is required. Keep the server template fixed and bind external fields as data.", "cue": "Ask each pair to finish two sentences: ‘The browser received…’ and ‘The server evaluated…’. Then ask which impact the records actually establish."}, {"id": "4", "title": "The Over-Privileged Grade-Helper", "short": "Grade-helper", "summary": "The schedule assistant is designed to answer read-only questions. It can read student feedback, but its integration also has a broadly privileged enrollment connection.", "capabilities": ["Student feedback", "Enrollment read access", "Privileged write available"], "trace": [["4A", "Product policy", "The schedule assistant may read availability. Only authorized enrollment staff can change a class registration."], ["4B", "Tool audit", "The assistant proposed a removal after reading the feedback record. The integration accepted it using its own elevated identity."], ["4C", "Enrollment snapshot", "The same fictional enrollment was present before the decision and absent after it. The change record names the assistant integration."]], "defenses": ["Ask the model to confirm with itself before changing records.", "Remove the write function from the read-only assistant and enforce actor authorization at the enrollment service.", "Record more detailed logs while leaving the existing permissions in place."], "decision": "In scope, evidence supports a finding.", "mechanism": "4A identifies the permission boundary. 4B shows a proposal and an allowed action, while 4C supplies independent evidence that the enrollment changed. Excessive agency made an unauthorized write possible.", "fix": "Give the read-only assistant read-only capabilities. Where a separate write workflow is needed, the enrollment service must authorize that specific actor and action.", "cue": "Hide 4C and ask what 4B proves by itself. Reveal 4C and ask which service should have enforced the permission boundary."}], "report": [{"label": "Specific title", "prompt": "Name the surface and the demonstrated effect.", "example": "Ticket summary preview disclosed a restricted scholarship-status field to a mock external recipient"}, {"label": "Scope and eligibility", "prompt": "What rule and fictional asset apply?", "example": "The exercise policy covers disclosure of another person’s restricted information in desk.mapua-demo.invalid. Record 2C supports that outcome."}, {"label": "Root cause", "prompt": "Which trust boundaries failed?", "example": "The ticket text and unrelated restricted data shared a summary context, and the output preview automatically loaded an external resource. This pairs indirect prompt injection with improper output handling."}, {"label": "Evidence and verification", "prompt": "In order, cite the evidence IDs, precondition, and what another reviewer should compare.", "example": "2A records the public ticket and the ordinary staff Summarize action. 2B identifies the restricted sample field. Compare it with the mock recipient’s field in 2C. In 2D the preview channel is blocked while the summary still displays. These scripted records establish no production reproduction rate."}, {"label": "Demonstrated impact and severity", "prompt": "What happened? What extent or score remains unknown?", "example": "One fictional student’s restricted status field reached the mock external recipient without a separate preview click or approval. The fixture does not establish wider exposure, reliability in production, or enough facts for a CVSS vector."}, {"label": "Structural fix and regression check", "prompt": "Name the control, where it belongs, and how to verify it.", "example": "Disable automatic external images in staff previews and keep unrelated scholarship data out of ticket summaries. Compare the approved original and patched fixture. The summary should still display and the external recipient should record no preview request."}]}</script>
+  <script>"use strict";
+
+const byId = (id) => document.getElementById(id);
+const data = JSON.parse(byId("workshop-data").textContent);
+const storageKey = "cybersync-mapuadesk-v1";
+const sections = ["scope", "cases", "report"];
+const duration = 25 * 60 * 1000;
+let storageAvailable = true;
+let saved = {};
+try {
+  saved = JSON.parse(localStorage.getItem(storageKey)) || {};
+} catch {
+  storageAvailable = false;
+}
+
+const answers = new Map(Object.entries(saved.answers || {}));
+const draft = data.report.map((_, i) => typeof saved.draft?.[i] === "string" ? saved.draft[i] : "");
+let caseIndex = Number.isInteger(saved.caseIndex) && data.cases[saved.caseIndex] ? saved.caseIndex : 0;
+let activeView = "scope";
+let presenter = false;
+let remaining = duration;
+let deadline = null;
+const exposedCases = new Set();
+
+function element(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+function updateSaveNote() {
+  byId("save-note").textContent = storageAvailable
+    ? "Your draft stays in this browser. Export a copy before you leave."
+    : "This browser blocked draft storage. Export a copy before closing or refreshing.";
+}
+
+function persist() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({ answers: Object.fromEntries(answers), draft, caseIndex }));
+    storageAvailable = true;
+  } catch {
+    storageAvailable = false;
+  }
+  updateSaveNote();
+}
+
+function markCurrent(button, active) {
+  if (active) button.setAttribute("aria-current", "page");
+  else button.removeAttribute("aria-current");
+}
+
+function openView(view, focus = false) {
+  activeView = view;
+  sections.forEach((name) => { byId(name).hidden = name !== view; });
+  document.querySelectorAll("[data-view]").forEach((button) => markCurrent(button, button.dataset.view === view));
+  if (view === "cases") renderCase();
+  if (focus) byId(`${view}-title`).focus();
+}
+
+function openCase(index, focus = true) {
+  caseIndex = index;
+  openView("cases");
+  persist();
+  if (focus) byId("case-title").focus();
+}
+
+function fillOptions(container, labels, group, type, selected) {
+  const previous = container.querySelectorAll(".option");
+  previous.forEach((option) => option.remove());
+  labels.forEach((text, index) => {
+    const label = element("label", undefined, "option");
+    const input = element("input");
+    input.type = type;
+    input.name = group;
+    input.value = String(index);
+    input.checked = selected.includes(input.value);
+    label.append(input, element("span", text));
+    container.append(label);
+  });
+}
+
+function renderEvidence(record) {
+  const partialCounts = { "2": 2, "4": 2 };
+  const count = presenter && !exposedCases.has(record.id) ? partialCounts[record.id] : undefined;
+  const entries = count ? record.trace.slice(0, count) : record.trace;
+  byId("trace").replaceChildren(...entries.map(([id, label, text]) => {
+    const row = element("li");
+    row.append(element("span", id, "record-id"), element("strong", label), element("p", text));
+    return row;
+  }));
+  byId("reveal-evidence").hidden = entries.length === record.trace.length;
+}
+
+function showComparison(visible) {
+  byId("reasoning").hidden = !visible;
+  byId("compare").setAttribute("aria-expanded", String(visible));
+  byId("compare").textContent = visible ? "Hide reasoning" : "Compare reasoning";
+}
+
+function renderCase() {
+  const record = data.cases[caseIndex];
+  const choice = answers.get(record.id) || {};
+  byId("case-progress").textContent = `${caseIndex + 1} of ${data.cases.length} cases`;
+  byId("case-label").textContent = `Case ${record.id.padStart(2, "0")}`;
+  byId("case-title").textContent = record.title;
+  byId("case-summary").textContent = record.summary;
+  byId("capabilities").replaceChildren(...record.capabilities.map((label) => element("li", label)));
+  byId("case-nav").querySelectorAll("button").forEach((button, index) => markCurrent(button, index === caseIndex));
+  renderEvidence(record);
+  byId("verdict").value = choice.verdict ?? "";
+  fillOptions(byId("risk-choices"), data.risks, "risk", "checkbox", choice.risks ?? []);
+  fillOptions(byId("defense-choices"), record.defenses, "defense", "radio", [choice.defense]);
+  byId("reasoning-verdict").textContent = record.decision;
+  byId("reasoning-mechanism").textContent = record.mechanism;
+  byId("reasoning-fix").textContent = record.fix;
+  byId("cue-text").textContent = record.cue;
+  byId("facilitator-cue").hidden = !presenter;
+  byId("previous-case").disabled = caseIndex === 0;
+  byId("next-case").textContent = caseIndex === data.cases.length - 1 ? "Open report worksheet" : "Next case";
+  showComparison(false);
+}
+
+function applyHash() {
+  const route = location.hash.slice(1);
+  const wasPresenter = presenter;
+  presenter = route === "presenter";
+  byId("presenter").hidden = !presenter;
+  byId("presenter-link").hidden = presenter;
+  if (!presenter) {
+    document.documentElement.classList.remove("projector");
+    byId("projector").setAttribute("aria-pressed", "false");
+    if (wasPresenter && deadline !== null) {
+      remaining = Math.max(0, deadline - Date.now());
+      deadline = null;
+      updateTimer();
+    }
+  }
+  if (sections.includes(route)) openView(route);
+  else if (activeView === "cases") renderCase();
+}
+
+function updateTimer() {
+  if (deadline !== null) {
+    remaining = Math.max(0, deadline - Date.now());
+    if (remaining === 0) deadline = null;
+  }
+  const seconds = Math.ceil(remaining / 1000);
+  const time = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  if (byId("clock").textContent !== time) byId("clock").textContent = time;
+  const label = deadline !== null ? "Pause timer" : remaining === duration ? "Start timer" : "Resume timer";
+  if (byId("timer-control").textContent !== label) byId("timer-control").textContent = label;
+  byId("timer-control").disabled = remaining === 0;
+}
+
+function makeReport() {
+  return ["# MapúaDesk AI — Fictional Case 2 Report", ...data.report.map((field, i) => `## ${field.label}\n\n${draft[i].trim() || "[Draft this section.]"}`)].join("\n\n") + "\n";
+}
+
+function toggleExample(visible) {
+  byId("report-example").hidden = !visible;
+  byId("example-toggle").setAttribute("aria-expanded", String(visible));
+  byId("example-toggle").textContent = visible ? "Hide example" : "Show example";
+  if (visible) byId("example-title").focus();
+}
+
+document.querySelectorAll("[data-view]").forEach((button) => {
+  button.addEventListener("click", () => openView(button.dataset.view, true));
+});
+byId("asset").textContent = data.asset;
+byId("scope-in").replaceChildren(...data.scope.included.map((text) => element("li", text)));
+byId("scope-out").replaceChildren(...data.scope.excluded.map((text) => element("li", text)));
+byId("start-cases").addEventListener("click", () => openView("cases", true));
+data.cases.forEach((record, index) => {
+  const button = element("button");
+  button.type = "button";
+  button.append(element("small", `Case ${record.id.padStart(2, "0")}`), element("span", record.short));
+  button.addEventListener("click", () => openCase(index));
+  byId("case-nav").append(button);
+});
+byId("previous-case").addEventListener("click", () => openCase(caseIndex - 1));
+byId("next-case").addEventListener("click", () => {
+  if (caseIndex === data.cases.length - 1) openView("report", true);
+  else openCase(caseIndex + 1);
+});
+byId("verdict").append(new Option("Choose a verdict", ""), ...data.verdicts.map((label, i) => new Option(label, String(i))));
+byId("case-form").addEventListener("change", () => {
+  answers.set(data.cases[caseIndex].id, {
+    verdict: byId("verdict").value,
+    risks: [...document.querySelectorAll("input[name='risk']:checked")].map((input) => input.value),
+    defense: document.querySelector("input[name='defense']:checked")?.value
+  });
+  persist();
+});
+byId("reveal-evidence").addEventListener("click", () => {
+  const record = data.cases[caseIndex];
+  exposedCases.add(record.id);
+  renderEvidence(record);
+  const lastNewRecord = byId("trace").children[2];
+  lastNewRecord.tabIndex = -1;
+  lastNewRecord.focus();
+});
+byId("compare").addEventListener("click", () => showComparison(byId("reasoning").hidden));
+byId("review-case-two").addEventListener("click", () => openCase(1));
+
+data.report.forEach((field, i) => {
+  const container = element("div");
+  const area = element("textarea");
+  area.id = `report-field-${i}`;
+  area.value = draft[i];
+  const label = element("label", field.label);
+  label.htmlFor = area.id;
+  const prompt = element("p", field.prompt, "field-prompt");
+  prompt.id = `report-prompt-${i}`;
+  area.setAttribute("aria-describedby", prompt.id);
+  area.addEventListener("input", () => {
+    draft[i] = area.value;
+    persist();
+  });
+  container.append(label, prompt, area);
+  byId("report-fields").append(container);
+  byId("example-fields").append(element("h4", field.label), element("p", field.example));
+});
+
+byId("copy-report").addEventListener("click", async () => {
+  const text = makeReport();
+  try {
+    await navigator.clipboard.writeText(text);
+    byId("report-status").textContent = "Copied the Markdown draft.";
+  } catch {
+    const area = byId("manual-copy");
+    area.value = text;
+    byId("copy-dialog").showModal();
+    area.focus();
+    area.select();
+  }
+});
+byId("download-report").addEventListener("click", () => {
+  const url = URL.createObjectURL(new Blob([makeReport()], { type: "text/markdown;charset=utf-8" }));
+  const link = element("a");
+  link.href = url;
+  link.download = "mapuadesk-case-2-report.md";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  byId("report-status").textContent = "Download requested.";
+});
+byId("example-toggle").addEventListener("click", () => {
+  if (!byId("report-example").hidden) toggleExample(false);
+  else if (presenter) toggleExample(true);
+  else {
+    byId("example-dialog").returnValue = "cancel";
+    byId("example-dialog").showModal();
+  }
+});
+byId("example-dialog").addEventListener("close", (event) => {
+  if (event.target.returnValue === "show") toggleExample(true);
+});
+byId("timer-control").addEventListener("click", () => {
+  if (deadline === null) deadline = Date.now() + remaining;
+  else {
+    remaining = Math.max(0, deadline - Date.now());
+    deadline = null;
+  }
+  updateTimer();
+});
+byId("timer-reset").addEventListener("click", () => {
+  deadline = null;
+  remaining = duration;
+  updateTimer();
+});
+byId("projector").addEventListener("click", (event) => {
+  const active = document.documentElement.classList.toggle("projector");
+  event.currentTarget.setAttribute("aria-pressed", String(active));
+});
+byId("exit-presenter").addEventListener("click", () => { location.hash = activeView; });
+byId("case-form").addEventListener("submit", (event) => event.preventDefault());
+byId("worksheet").addEventListener("submit", (event) => event.preventDefault());
+window.addEventListener("hashchange", applyHash);
+setInterval(updateTimer, 250);
+updateSaveNote();
+openView("scope");
+applyHash();
+</script>
+</body>
+</html>
